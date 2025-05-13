@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task 4: Recommendation System</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        .code { background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        h1 { color: #2c3e50; }
+        h2 { color: #3498db; }
+    </style>
+</head>
+<body>
+    <h1>Task 4: Recommendation System</h1>
+    
+    <h2>Implementation Code</h2>
+    <div class="code">
+        <pre>
+# Recommendation System with Collaborative Filtering
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import NMF
+
+# Sample user-item ratings matrix
+ratings = {
+    'User1': [5, 3, 0, 1],
+    'User2': [4, 0, 0, 1],
+    'User3': [1, 1, 0, 5],
+    'User4': [1, 0, 0, 4],
+    'User5': [0, 1, 5, 4]
+}
+df = pd.DataFrame(ratings, index=['Movie1', 'Movie2', 'Movie3', 'Movie4']).T
+
+# Matrix Factorization with NMF
+model = NMF(n_components=2, init='random', random_state=42)
+W = model.fit_transform(df)
+H = model.components_
+
+# Create recommendations
+def recommend_movies(user_index, n_recommendations=2):
+    predicted_ratings = np.dot(W, H)
+    user_ratings = predicted_ratings[user_index]
+    rated_movies = np.where(df.iloc[user_index] > 0)[0]
+    recommendations = []
+    
+    for i in range(len(user_ratings)):
+        if i not in rated_movies:
+            recommendations.append((i, user_ratings[i]))
+    
+    recommendations.sort(key=lambda x: x[1], reverse=True)
+    return [df.columns[i] for i, _ in recommendations[:n_recommendations]]
+
+# Example recommendation
+print("Recommendations for User1:", recommend_movies(0))
+        </pre>
+    </div>
+
+    <h2>Expected Output</h2>
+    <div class="code">
+        <pre>
+Recommendations for User1: ['Movie3']
+        </pre>
+    </div>
+</body>
+</html>
